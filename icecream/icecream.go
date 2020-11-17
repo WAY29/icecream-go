@@ -55,9 +55,9 @@ func Ic(values ...interface{}) {
 						results := raf.Call([]reflect.Value{reflect.ValueOf(v)})
 						printMsg(results[0].Interface())
 					}
-					if i < lenOfValues-1 { // ? print split character
-						printMsg(", ")
-					}
+				}
+				if i < lenOfValues-1 { // ? print split character
+					printMsg(", ")
 				}
 			}
 			printMsg("\n")
