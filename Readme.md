@@ -9,7 +9,7 @@ package main
 
 import (
 	"fmt"
-	ic "github.com/WAY29/icecream-go/icecream"
+	. "github.com/WAY29/icecream-go/icecream"
 )
 func foo(a int) int {
 	return a + 333
@@ -17,19 +17,19 @@ func foo(a int) int {
 
 
 func bar() {
-	ic.Ic()
+	Ic()
 }
 
 func main() {
-ic.Ic(foo(123));
+Ic(foo(123));
 // Outputs:
 // ic| foo(123): 456
 
-ic.Ic(1 + 5);
+Ic(1 + 5);
 // Outputs:
 // ic| 1 + 5: 6
 
-ic.Ic(foo(123), 1 + 5);
+Ic(foo(123), 1 + 5);
 // Outputs:
 // ic| foo(123): 456, 1 + 5: 6
 bar();

@@ -6,7 +6,7 @@ import (
 	"os"
 	"reflect"
 
-	ic "github.com/WAY29/icecream-go/icecream"
+	. "github.com/WAY29/icecream-go/icecream"
 )
 
 func add(a int) int {
@@ -14,7 +14,7 @@ func add(a int) int {
 }
 
 func test() {
-	ic.Ic()
+	Ic()
 }
 
 func toString(v interface{}) interface{} {
@@ -40,10 +40,10 @@ func logfile(s string) {
 func main() {
 	thisIsFUnny := 1
 	funny := "qwe"
-	ic.ConfigureArgToStringFunction(toString)
-	ic.ConfigureIncludeContext(true)
-	ic.Ic(thisIsFUnny, funny)
-	ic.Ic(1)
-	ic.Ic(add(123))
+	ConfigureArgToStringFunction(toString)
+	ConfigureIncludeContext(true)
+	Ic(thisIsFUnny, funny)
+	Ic(1)
+	Ic(add(123))
 	test()
 }
