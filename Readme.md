@@ -39,7 +39,7 @@ bar();
 ```
 
 ## Depends
-- [reflectsource][github.com/shurcooL/go/reflectsource]
+- [reflectsource](github.com/shurcooL/go/reflectsource)
 
 
 ## Installation
@@ -97,3 +97,5 @@ func main() {
     ic.Ic(1, "asd")
 }
 ```
+
+[github.com/shurcooL/go/reflectsource]: 
