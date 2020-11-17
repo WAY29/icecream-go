@@ -36,7 +36,7 @@ func Ic(values ...interface{}) {
 		lenOfValues := len(values)
 		if lenOfValues > 0 { // ? print value
 			if includeContext { // ? print prefix
-				msg = fmt.Sprintf("%s:%d in %s()- ", relFilename, line, funcName)
+				msg = fmt.Sprintf("%s%s:%d in %s()- ", prefixString, relFilename, line, funcName)
 			} else {
 				msg = prefixString
 			}

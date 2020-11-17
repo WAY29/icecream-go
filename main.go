@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"reflect"
 
 	ic "github.com/WAY29/icecream-go/icecream"
@@ -23,10 +25,22 @@ func toString(v interface{}) interface{} {
 	return fmt.Sprintf("%#v", v)
 }
 
+func logfile(s string) {
+	filePath := "log.log"
+	file, err := os.OpenFile(filePath, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0666)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer file.Close()
+	write := bufio.NewWriter(file)
+	write.WriteString(s)
+	write.Flush()
+}
+
 func main() {
 	thisIsFUnny := 1
 	funny := "qwe"
-
+	ic.ConfigureArgToStringFunction(toString)
 	ic.ConfigureIncludeContext(true)
 	ic.Ic(thisIsFUnny, funny)
 	ic.Ic(1)
