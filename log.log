@@ -1,4 +1,0 @@
-ic| main.go:48 in main.main()- thisIsFUnny: 1, funny: "qwe"
-ic| main.go:49 in main.main()- 1
-ic| main.go:50 in main.main()- add(123): 456
-ic| main.go:17 in main.test()
