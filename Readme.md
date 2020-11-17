@@ -97,5 +97,3 @@ func main() {
     ic.Ic(1, "asd")
 }
 ```
-
-[github.com/shurcooL/go/reflectsource]: 
