@@ -52,7 +52,7 @@ go get -u "github.com/WAY29/icecream-go/icecream"
 
 If you want to change the prefix of the output, you can call `icecream.ConfigurePrefix("Hello| ")` (by default the prefix is `ic| `).
 
-If you want to change how the result is outputted, you can call `icecream.ConfigureOutputFunction()`.
+If you want to change how the result is outputted, you can call `icecream.ConfigureOutputFunction(f)`. func may be type of `func(s interface{})`.
 For example, if you want to log your messages to a file:
 ```go
 func logfile(s string) {
@@ -72,7 +72,7 @@ func main() {
 }
 ```
 
-If you want to change how the value is outputted, you can call `icecream.ConfigureArgToStringFunction()`.
+If you want to change how the value is outputted, you can call `icecream.ConfigureArgToStringFunction(f)`, func may be type of `func(v interface{}) interface{}`.
 For example, if you want to print more detail about a string:
 ```go
 func toString(v interface{}) interface{} {
@@ -97,3 +97,5 @@ func main() {
     ic.Ic(1, "asd")
 }
 ```
+
+If you want to reset configuration,  you can call `icecream.ResetPrefix()`,`icecream.ResetOutputFunction()`, `icecream.ResetArgToStringFunction()`,`icecream.ResetIncludeContext()` .

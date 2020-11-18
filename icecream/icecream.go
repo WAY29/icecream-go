@@ -44,14 +44,14 @@ func Ic(values ...interface{}) {
 			for i, v := range values { // ? print value
 				vName := reflectsource.GetParentArgExprAsString(uint32(i))
 				fmtV := fmt.Sprintf("%#v", v)
-				if vName == fmtV { // ? vName the same as value
+				if vName == fmtV { // ? vName the same as value, just print one
 					printMsg(fmtV)
 				} else {
 					msg = fmt.Sprintf("%s: ", vName)
 					printMsg(msg)
-					if rafk == reflect.Invalid { // ? argToStringFunction default is fmt.Sprintf
+					if rafk == reflect.Invalid || rafk == reflect.Bool { // ? argToStringFunction default is fmt.Sprintf
 						printMsg(fmt.Sprintf("%#v", v))
-					} else if rafk == reflect.Func {
+					} else if rafk == reflect.Func { // ? call custom argToStringFunction
 						results := raf.Call([]reflect.Value{reflect.ValueOf(v)})
 						printMsg(results[0].Interface())
 					}
@@ -61,7 +61,7 @@ func Ic(values ...interface{}) {
 				}
 			}
 			printMsg("\n")
-		} else { // ? print line
+		} else { // ? print line if value is nil
 			msg = fmt.Sprintf("%s%s:%d in %s()\n", prefixString, relFilename, line, funcName)
 			printMsg(msg)
 		}
@@ -72,7 +72,7 @@ func ConfigurePrefix(prefix string) {
 	prefixString = prefix
 }
 
-// func(v interface{})
+// f func(s interface{})
 func ConfigureOutputFunction(f interface{}) bool {
 	rf := reflect.ValueOf(f)
 	if rf.Kind() == reflect.Func {
@@ -82,7 +82,7 @@ func ConfigureOutputFunction(f interface{}) bool {
 	return false
 }
 
-// func(v interface{}) interface{}
+// f func(v interface{}) interface{}
 func ConfigureArgToStringFunction(f interface{}) bool {
 	rf := reflect.ValueOf(f)
 	if rf.Kind() == reflect.Func {
@@ -94,4 +94,20 @@ func ConfigureArgToStringFunction(f interface{}) bool {
 
 func ConfigureIncludeContext(boolean bool) {
 	includeContext = boolean
+}
+
+func ResetPrefix() {
+	prefixString = "ic| "
+}
+
+func ResetOutputFunction() {
+	outputFunction = reflect.ValueOf(os.Stderr.WriteString)
+}
+
+func ResetArgToStringFunction() {
+	argToStringFunction = reflect.ValueOf(false)
+}
+
+func ResetIncludeContext() {
+	includeContext = false
 }
