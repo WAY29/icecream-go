@@ -43,7 +43,7 @@ func main() {
 	ConfigureArgToStringFunction(toString)
 	ConfigureIncludeContext(true)
 	Ic(thisIsFUnny, funny)
-	Ic(1)
+	Ic(1, 2, "Test")
 	Ic(add(123))
 	test()
 }

@@ -23,6 +23,17 @@ func printMsg(msg interface{}) {
 	}
 }
 
+func printValue(v interface{}) {
+	raf := argToStringFunction
+	rafk := raf.Kind()
+	if rafk == reflect.Invalid || rafk == reflect.Bool { // ? argToStringFunction default is fmt.Sprintf
+		printMsg(fmt.Sprintf("%#v", v))
+	} else if rafk == reflect.Func { // ? call custom argToStringFunction
+		results := raf.Call([]reflect.Value{reflect.ValueOf(v)})
+		printMsg(results[0].Interface())
+	}
+}
+
 func Ic(values ...interface{}) {
 	var msg string
 	line := 0
@@ -30,8 +41,6 @@ func Ic(values ...interface{}) {
 	funcName := runtime.FuncForPC(pc).Name()
 	pwd, _ := os.Getwd()
 	relFilename, _ := filepath.Rel(pwd, filename)
-	raf := argToStringFunction
-	rafk := raf.Kind()
 	if ok {
 		lenOfValues := len(values)
 		if lenOfValues > 0 { // ? print value
@@ -45,16 +54,11 @@ func Ic(values ...interface{}) {
 				vName := reflectsource.GetParentArgExprAsString(uint32(i))
 				fmtV := fmt.Sprintf("%#v", v)
 				if vName == fmtV { // ? vName the same as value, just print one
-					printMsg(fmtV)
+					printValue(v)
 				} else {
 					msg = fmt.Sprintf("%s: ", vName)
 					printMsg(msg)
-					if rafk == reflect.Invalid || rafk == reflect.Bool { // ? argToStringFunction default is fmt.Sprintf
-						printMsg(fmt.Sprintf("%#v", v))
-					} else if rafk == reflect.Func { // ? call custom argToStringFunction
-						results := raf.Call([]reflect.Value{reflect.ValueOf(v)})
-						printMsg(results[0].Interface())
-					}
+					printValue(v)
 				}
 				if i < lenOfValues-1 { // ? print split character
 					printMsg(", ")
