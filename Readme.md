@@ -39,7 +39,7 @@ bar();
 ```
 
 ## Depends
-- [reflectsource](github.com/shurcooL/go/reflectsource)
+- [reflectsource](https://github.com/shurcooL/go/tree/master/reflectsource)
 
 
 ## Installation
