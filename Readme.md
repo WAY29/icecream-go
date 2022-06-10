@@ -48,6 +48,13 @@ bar();
 go get -u "github.com/WAY29/icecream-go/icecream"
 ```
 
+## Import
+
+```go
+import ic "github.com/WAY29/icecream-go/icecream"
+// or just import . "github.com/WAY29/icecream-go/icecream"
+```
+
 ## Configuration
 
 If you want to change the prefix of the output, you can call `icecream.ConfigurePrefix("Hello| ")` (by default the prefix is `ic| `).
@@ -99,3 +106,30 @@ func main() {
 ```
 
 If you want to reset configuration,  you can call `icecream.ResetPrefix()`,`icecream.ResetOutputFunction()`, `icecream.ResetArgToStringFunction()`,`icecream.ResetIncludeContext()` .
+
+## Miscellaneous
+
+`Format(...interface{})` is like `ic()` but the output is returned as a string instead of written to stderr.
+
+```go
+func main() {
+    result := ic.Format("sup")
+    fmt.Printf("%s", result)
+}
+```
+
+Additionally, `Ic()`'s output can be entirely disabled, and later re-enabled, with `Disable()` and `Enable()` respectively.
+```go
+func main() {
+    ic.Ic(1)
+    ic.Disable()
+    ic.Ic(2)
+    ic.Enable()
+    ic.Ic(3)
+}
+```
+Prints
+```
+ic| 1
+ic| 3
+```
