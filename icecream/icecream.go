@@ -14,24 +14,27 @@ var prefixString = "ic| "
 var outputFunction = reflect.ValueOf(os.Stderr.WriteString)
 var argToStringFunction reflect.Value
 var includeContext = false
+var disableOutput = false
 
 func printMsg(msg interface{}) {
 	rf := outputFunction
 	s := reflect.ValueOf(msg)
-	if rf.Kind() == reflect.Func {
+	if rf.Kind() == reflect.Func && !disableOutput {
 		rf.Call([]reflect.Value{s})
 	}
 }
 
-func printValue(v interface{}) {
+func formatValue(v interface{}) interface{} {
 	raf := argToStringFunction
 	rafk := raf.Kind()
 	if rafk == reflect.Invalid || rafk == reflect.Bool { // ? argToStringFunction default is fmt.Sprintf
-		printMsg(fmt.Sprintf("%#v", v))
+		return fmt.Sprintf("%#v", v)
 	} else if rafk == reflect.Func { // ? call custom argToStringFunction
 		results := raf.Call([]reflect.Value{reflect.ValueOf(v)})
-		printMsg(results[0].Interface())
+		return results[0].Interface()
 	}
+
+	return nil
 }
 
 func Ic(values ...interface{}) []interface{} {
@@ -58,11 +61,11 @@ func Ic(values ...interface{}) []interface{} {
 				vName := reflectsource.GetParentArgExprAsString(uint32(i))
 				fmtV := fmt.Sprintf("%#v", v)
 				if vName == fmtV { // ? vName the same as value, just print one
-					printValue(v)
+					printMsg(formatValue(v))
 				} else {
 					msg = fmt.Sprintf("%s: ", vName)
 					printMsg(msg)
-					printValue(v)
+					printMsg(formatValue(v))
 				}
 				if i < lenOfValues-1 { // ? print split character
 					printMsg(", ")
@@ -80,11 +83,50 @@ func Ic(values ...interface{}) []interface{} {
 	return returnValue
 }
 
+func Format(values ...interface{}) string {
+	var (
+		returnMsg string = ""
+	)
+
+	line := 0
+	pc, filename, line, ok := runtime.Caller(1)
+	funcName := runtime.FuncForPC(pc).Name()
+	pwd, _ := os.Getwd()
+	relFilename, _ := filepath.Rel(pwd, filename)
+	if ok {
+		lenOfValues := len(values)
+		if lenOfValues > 0 { // ? print value
+			if includeContext { // ? print prefix
+				returnMsg += fmt.Sprintf("%s%s:%d in %s()- ", prefixString, relFilename, line, funcName)
+			} else {
+				returnMsg += prefixString
+			}
+			for i, v := range values { // ? print value
+				vName := reflectsource.GetParentArgExprAsString(uint32(i))
+				fmtV := fmt.Sprintf("%#v", v)
+				if vName == fmtV { // ? vName the same as value, just print one
+					returnMsg += fmt.Sprintf("%v", formatValue(v))
+				} else {
+					returnMsg += fmt.Sprintf("%s: ", vName)
+					returnMsg += fmt.Sprintf("%v", formatValue(v))
+				}
+				if i < lenOfValues-1 { // ? print split character
+					returnMsg += ", "
+				}
+
+			}
+		} else { // ? print line if value is nil
+			returnMsg = fmt.Sprintf("%s%s:%d in %s()\n", prefixString, relFilename, line, funcName)
+		}
+	}
+
+	return returnMsg
+}
+
 func ConfigurePrefix(prefix string) {
 	prefixString = prefix
 }
 
-// f func(s interface{})
 func ConfigureOutputFunction(f interface{}) bool {
 	rf := reflect.ValueOf(f)
 	if rf.Kind() == reflect.Func {
@@ -94,7 +136,6 @@ func ConfigureOutputFunction(f interface{}) bool {
 	return false
 }
 
-// f func(v interface{}) interface{}
 func ConfigureArgToStringFunction(f interface{}) bool {
 	rf := reflect.ValueOf(f)
 	if rf.Kind() == reflect.Func {
@@ -102,6 +143,10 @@ func ConfigureArgToStringFunction(f interface{}) bool {
 		return true
 	}
 	return false
+}
+
+func Disable() {
+	disableOutput = true
 }
 
 func ConfigureIncludeContext(boolean bool) {
@@ -122,4 +167,8 @@ func ResetArgToStringFunction() {
 
 func ResetIncludeContext() {
 	includeContext = false
+}
+
+func Enable() {
+	disableOutput = false
 }
