@@ -34,8 +34,12 @@ func printValue(v interface{}) {
 	}
 }
 
-func Ic(values ...interface{}) {
-	var msg string
+func Ic(values ...interface{}) []interface{} {
+	var (
+		msg         string
+		returnValue = make([]interface{}, 0, len(values))
+	)
+
 	line := 0
 	pc, filename, line, ok := runtime.Caller(1)
 	funcName := runtime.FuncForPC(pc).Name()
@@ -63,6 +67,8 @@ func Ic(values ...interface{}) {
 				if i < lenOfValues-1 { // ? print split character
 					printMsg(", ")
 				}
+
+				returnValue = append(returnValue, v) // ? add value in returnValue
 			}
 			printMsg("\n")
 		} else { // ? print line if value is nil
@@ -70,6 +76,8 @@ func Ic(values ...interface{}) {
 			printMsg(msg)
 		}
 	}
+
+	return returnValue
 }
 
 func ConfigurePrefix(prefix string) {
