@@ -107,6 +107,31 @@ func main() {
 
 If you want to reset configuration,  you can call `icecream.ResetPrefix()`,`icecream.ResetOutputFunction()`, `icecream.ResetArgToStringFunction()`,`icecream.ResetIncludeContext()` .
 
+## Return Value
+`Ic()` returns its arguments, so `Ic()` can easily be inserted into pre-existing code.
+
+```go
+func half(i interface{}) int {
+    if ii, ok := i.(int); ok {
+        return ii / 2
+    }
+
+    return -1
+}
+
+
+func main() {
+    a := 6
+    b := half(ic.Ic(a)[0])
+    ic.Ic(b)
+}
+```
+Prints
+```
+ic| a: 6
+ic| b: 3
+```
+
 ## Miscellaneous
 
 `Format(...interface{})` is like `ic()` but the output is returned as a string instead of written to stderr.
