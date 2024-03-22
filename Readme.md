@@ -8,9 +8,9 @@ A Go port of Python's [IceCream](https://github.com/gruns/icecream).
 package main
 
 import (
-	"fmt"
 	. "github.com/WAY29/icecream-go/icecream"
 )
+
 func foo(a int) int {
 	return a + 333
 }
@@ -21,18 +21,18 @@ func bar() {
 }
 
 func main() {
-Ic(foo(123));
-// Outputs:
-// ic| foo(123): 456
+	Ic(foo(123))
+	// Outputs:
+	// ic| foo(123): 456
 
-Ic(1 + 5);
-// Outputs:
-// ic| 1 + 5: 6
+	Ic(1 + 5)
+	// Outputs:
+	// ic| 1 + 5: 6
 
-Ic(foo(123), 1 + 5);
-// Outputs:
-// ic| foo(123): 456, 1 + 5: 6
-bar();
+	Ic(foo(123), 1 + 5)
+	// Outputs:
+	// ic| foo(123): 456, 1 + 5: 6
+	bar()
 }
 // Outputs:
 // ic| main.go:12 in main.bar()
@@ -76,6 +76,11 @@ func logfile(s string) {
 func main() {
 	ic.ConfigureOutputFunction(logfile)
 	ic.Ic(1, 2, 3)
+
+	// output to stringBuilder
+	builder := strings.Builder{}
+	ic.ConfigureOutputFunction(&builder)
+	ic.Ic("hello")
 }
 ```
 
@@ -83,15 +88,28 @@ If you want to change how the value is outputted, you can call `icecream.Configu
 For example, if you want to print more detail about a string:
 ```go
 func toString(v interface{}) interface{} {
-	rv := reflect.ValueOf(v)
-	if rv.Kind() == reflect.String {
-		return fmt.Sprintf("[!string %#v with length %d!]", v, len(v.(string)))
-	}
-	return fmt.Sprintf("%#v", v)
+    rv := reflect.ValueOf(v)
+    if rv.Kind() == reflect.String {
+        return fmt.Sprintf("[!string %#v with length %d!]", v, len(v.(string)))
+    }
+    return fmt.Sprintf("%#v", v)
 }
 func main() {
     s := "string"
-	ic.ConfigureArgToStringFunction(toString)
+    ic.ConfigureArgToStringFunction(toString)
+    ic.Ic(s)
+    ic.Ic("test")
+}
+```
+
+If you want to change the value name is outputted, you can call `icecream.ConfigureArgNameFormatterFunc`.
+For example, if you want to print value name with ansi color:
+```go
+func main() {
+    s := "string"
+    ic.ConfigureArgNameFormatterFunc(func(name string) string {
+        return "\u001B[36m" + name + "\u001B[0m"
+    })
     ic.Ic(s)
     ic.Ic("test")
 }

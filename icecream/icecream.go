@@ -2,6 +2,7 @@ package icecream
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -13,6 +14,7 @@ import (
 var prefixString = "ic| "
 var outputFunction = reflect.ValueOf(os.Stderr.WriteString)
 var argToStringFunction reflect.Value
+var argNameFormatterFunc reflect.Value
 var includeContext = false
 var disableOutput = false
 
@@ -35,6 +37,18 @@ func formatValue(v interface{}) interface{} {
 	}
 
 	return nil
+}
+
+func formatArgName(argName string) string {
+	raf := argNameFormatterFunc
+	if raf.Kind() == reflect.Func { // call custom argNameFormatterFunc
+		results := raf.Call([]reflect.Value{reflect.ValueOf(argName)})
+		if ret, ok := results[0].Interface().(string); ok {
+			return ret
+		}
+	}
+
+	return argName
 }
 
 func Ic(values ...interface{}) []interface{} {
@@ -63,7 +77,7 @@ func Ic(values ...interface{}) []interface{} {
 				if vName == fmtV { // ? vName the same as value, just print one
 					printMsg(formatValue(v))
 				} else {
-					msg = fmt.Sprintf("%s: ", vName)
+					msg = fmt.Sprintf("%s: ", formatArgName(vName))
 					printMsg(msg)
 					printMsg(formatValue(v))
 				}
@@ -127,8 +141,15 @@ func ConfigurePrefix(prefix string) {
 	prefixString = prefix
 }
 
-func ConfigureOutputFunction(f interface{}) bool {
-	rf := reflect.ValueOf(f)
+// ConfigureOutputFunction modifies output that writes the final msg into w.
+// w should be io.StringWriter or function with string arg,
+// the return value indicates whether w is legal
+func ConfigureOutputFunction(w interface{}) bool {
+	if strWriter, ok := w.(io.StringWriter); ok {
+		outputFunction = reflect.ValueOf(strWriter.WriteString)
+		return true
+	}
+	rf := reflect.ValueOf(w)
 	if rf.Kind() == reflect.Func {
 		outputFunction = rf
 		return true
@@ -140,6 +161,18 @@ func ConfigureArgToStringFunction(f interface{}) bool {
 	rf := reflect.ValueOf(f)
 	if rf.Kind() == reflect.Func {
 		argToStringFunction = rf
+		return true
+	}
+	return false
+}
+
+// ConfigureArgNameFormatterFunc config arg name formatter.
+// f should be `func(string) string`,
+// the return value indicates whether w is legal.
+func ConfigureArgNameFormatterFunc(f func(string) string) bool {
+	rf := reflect.ValueOf(f)
+	if rf.Kind() == reflect.Func {
+		argNameFormatterFunc = rf
 		return true
 	}
 	return false
